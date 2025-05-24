@@ -69,6 +69,27 @@ export const BudgetResult: React.FC<BudgetResultProps> = ({
             بناءً على{" "}
             {financingOption === "Mortgage" ? "الرهن العقاري" : "الدفع النقدي"}
           </p>
+          <div className="mt-2 bg-blue-50 p-3 rounded-md text-sm text-blue-900">
+            <p className="font-semibold mb-1">كيف تم احتساب هذه الميزانية:</p>
+            {financingOption === "Mortgage" ? (
+              <ul className="list-disc list-inside space-y-1">
+                <li>صافي الدخل = الدخل الشهري - الالتزامات الشهرية</li>
+                <li>نسبة التمويل العقاري المتاحة = 35% من صافي الدخل</li>
+                <li>قيمة القرض = نسبة التمويل × 200 (مضاعف القرض)</li>
+                <li>
+                  الميزانية القصوى = قيمة القرض الكلية التي يمكنك الحصول عليها
+                </li>
+              </ul>
+            ) : (
+              <ul className="list-disc list-inside space-y-1">
+                <li>صافي الدخل = الدخل الشهري - الالتزامات الشهرية</li>
+                <li>
+                  الميزانية القصوى = صافي الدخل الشهري × 12 شهر �� 4 سنوات
+                </li>
+                <li>يفترض هذا المبلغ أنك ستدخر لمدة 4 سنوات للشراء نقدًا</li>
+              </ul>
+            )}
+          </div>
         </div>
 
         <div className="border-b pb-3">
