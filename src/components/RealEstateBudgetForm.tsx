@@ -2,7 +2,7 @@ import React from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { saudiCities, propertyTypes, financingOptions } from "@/lib/api";
+import { saudiCities } from "@/lib/api";
 
 import {
   Form,
@@ -30,6 +30,33 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
+// Work locations for major cities
+const workLocations = {
+  الرياض: [
+    "شمال الرياض",
+    "جنوب الرياض",
+    "شرق الرياض",
+    "غرب الرياض",
+    "وسط الرياض",
+  ],
+  جدة: ["شمال جدة", "جنوب جدة", "شرق جدة", "غرب جدة", "وسط جدة"],
+  "مكة المكرمة": ["المنطقة المركزية", "العزيزية", "الششة", "النسيم", "العوالي"],
+  "المدينة المنورة": [
+    "المنطقة المركزية",
+    "قباء",
+    "العوالي",
+    "الحرة الشرقية",
+    "النخيل",
+  ],
+  الدمام: [
+    "شمال الدمام",
+    "جنوب الدمام",
+    "شرق الدمام",
+    "غرب الدمام",
+    "وسط الدمام",
+  ],
+};
+
 // Form schema with validation
 const formSchema = z.object({
   monthlyIncome: z.coerce
@@ -40,7 +67,7 @@ const formSchema = z.object({
     .number({ invalid_type_error: "يرجى إدخال رقم صحيح" })
     .min(0, "لا يمكن أن تكون الالتزامات الشهرية رقماً سالباً"),
   currentCity: z.string().min(1, "يرجى اختيار المدينة الحالية"),
-  futureCity: z.string().min(1, "يرجى اختيار مدينة الاستقرار المستقبلية"),
+  workLocation: z.string().min(1, "يرجى اختيار منطقة العمل"),
   familySize: z.coerce
     .number({ invalid_type_error: "يرجى إدخال رقم صحيح" })
     .int("يجب أن يكون عدد أفراد الأسرة رقماً صحيحاً")
@@ -48,13 +75,9 @@ const formSchema = z.object({
     .max(20, "يرجى التحقق من عدد أفراد الأسرة"),
   requiredRooms: z.coerce
     .number({ invalid_type_error: "يرجى إدخال رقم صحيح" })
-    .int("يجب أن يكون عدد الغرف رقماً صحيح��ً")
+    .int("يجب أن يكون عدد الغرف رقماً صحيحاً")
     .min(1, "يجب أن يكون عدد الغرف على الأقل 1")
     .max(10, "يرجى التحقق من عدد الغرف المطلوبة"),
-  preferredPropertyType: z.string().min(1, "يرجى اختيار نوع العقار المفضل"),
-  ownershipPreference: z.enum(["buy", "rent"], {
-    invalid_type_error: "يرجى اختيار تفضيل التملك أو الإيجار",
-  }),
   age: z.coerce
     .number({ invalid_type_error: "يرجى إدخال رقم صحيح" })
     .int("يجب أن يكون العمر رقماً صحيحاً")
@@ -64,7 +87,10 @@ const formSchema = z.object({
     .number({ invalid_type_error: "يرجى إدخال رقم صحيح" })
     .min(0, "لا يمكن أن تكون نسبة الزيادة السنوية رقماً سالباً")
     .max(20, "يرجى التحقق من نسبة الزيادة السنوية (الحد الأقصى 20%)"),
-  financingOption: z.string().min(1, "يرجى اختيار خيار التمويل المفضل"),
+  mortgageInterestRate: z.coerce
+    .number({ invalid_type_error: "يرجى إدخال رقم صحيح" })
+    .min(0, "لا يمكن أن تكون نسبة الفائدة رقماً سالباً")
+    .max(15, "يرجى التحقق من نسبة الفائدة (الحد الأقصى 15%)"),
 });
 
 export type BudgetFormValues = z.infer<typeof formSchema>;
@@ -82,14 +108,12 @@ export const RealEstateBudgetForm: React.FC<RealEstateBudgetFormProps> = ({
       monthlyIncome: 0,
       monthlyObligations: 0,
       currentCity: "",
-      futureCity: "",
+      workLocation: "",
       familySize: 1,
       requiredRooms: 2,
-      preferredPropertyType: "",
-      ownershipPreference: "buy",
       age: 30,
       expectedSalaryIncrease: 3,
-      financingOption: "",
+      mortgageInterestRate: 4.0,
     },
   });
 
@@ -110,6 +134,23 @@ export const RealEstateBudgetForm: React.FC<RealEstateBudgetFormProps> = ({
 
     form.setValue("requiredRooms", recommendedRooms);
   }, [form.watch("familySize")]);
+
+  // Update work locations when city changes
+  const [availableWorkLocations, setAvailableWorkLocations] = React.useState<
+    string[]
+  >([]);
+
+  React.useEffect(() => {
+    const city = form.watch("currentCity");
+    if (city && workLocations[city as keyof typeof workLocations]) {
+      setAvailableWorkLocations(
+        workLocations[city as keyof typeof workLocations],
+      );
+      form.setValue("workLocation", ""); // Reset work location when city changes
+    } else {
+      setAvailableWorkLocations([]);
+    }
+  }, [form.watch("currentCity")]);
 
   return (
     <Card className="w-full max-w-md shadow-lg">
@@ -204,29 +245,23 @@ export const RealEstateBudgetForm: React.FC<RealEstateBudgetFormProps> = ({
 
                   <FormField
                     control={form.control}
-                    name="financingOption"
+                    name="mortgageInterestRate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>خيار التمويل المفضل</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="اختر خيار التمويل" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {financingOptions.map((option) => (
-                              <SelectItem key={option} value={option}>
-                                {option}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <FormLabel>نسبة الفائدة للقرض العقاري (%)</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="مثال: 4"
+                            type="number"
+                            step="0.1"
+                            {...field}
+                            onChange={(e) =>
+                              field.onChange(Number(e.target.value))
+                            }
+                          />
+                        </FormControl>
                         <FormDescription>
-                          سيؤثر اختيارك على حساب الميزانية القصوى
+                          النسبة المتوقعة بناءً على توجهات السوق هي 4%
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -314,7 +349,7 @@ export const RealEstateBudgetForm: React.FC<RealEstateBudgetFormProps> = ({
 
               <AccordionItem value="location">
                 <AccordionTrigger className="text-lg font-medium text-blue-700">
-                  معلومات الموقع والتفضيلات
+                  معلومات الموقع
                 </AccordionTrigger>
                 <AccordionContent className="space-y-4 pt-4">
                   <FormField
@@ -347,85 +382,30 @@ export const RealEstateBudgetForm: React.FC<RealEstateBudgetFormProps> = ({
 
                   <FormField
                     control={form.control}
-                    name="futureCity"
+                    name="workLocation"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>مدينة الاستقرار المستقبلية</FormLabel>
+                        <FormLabel>منطقة العمل</FormLabel>
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
+                          disabled={availableWorkLocations.length === 0}
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="اختر مدينة الاستقرار المستقبلية" />
+                              <SelectValue placeholder="اختر منطقة العمل" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {saudiCities.map((city) => (
-                              <SelectItem key={city} value={city}>
-                                {city}
+                            {availableWorkLocations.map((location) => (
+                              <SelectItem key={location} value={location}>
+                                {location}
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
                         <FormDescription>
-                          المدينة التي تنوي الاستقرار فيها على المدى الطويل
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="preferredPropertyType"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>نوع العقار المفضل</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="اختر نوع العقار" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {propertyTypes.map((type) => (
-                              <SelectItem key={type} value={type}>
-                                {type}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="ownershipPreference"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>هل تفضل التملك أو الإيجار؟</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="اختر تفضيلك" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="buy">تملك</SelectItem>
-                            <SelectItem value="rent">إيجار</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormDescription>
-                          سنحلل الخيار الأفضل لك بناءً على معلوماتك وظروف السوق
+                          اختر المنطقة التي تعمل فيها لتحديد الأحياء القريبة
                         </FormDescription>
                         <FormMessage />
                       </FormItem>

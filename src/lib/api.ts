@@ -204,6 +204,120 @@ export const financingOptions = [
 ];
 
 /**
+ * Work locations by district - mapping work areas to nearby districts
+ * This helps recommend districts close to work
+ */
+export const workLocationToDistricts = {
+  "شمال الرياض": [
+    "حي النرجس",
+    "حي الياسمين",
+    "حي الملقا",
+    "حي القيروان",
+    "حي النفل",
+  ],
+  "جنوب الرياض": [
+    "حي الشفا",
+    "حي العزيزية",
+    "حي النسيم",
+    "حي الدار البيضاء",
+    "حي الفيحاء",
+  ],
+  "شرق الرياض": [
+    "حي الروضة",
+    "حي الرواد",
+    "حي الربيع",
+    "حي الريان",
+    "حي النهضة",
+  ],
+  "غرب الرياض": [
+    "حي عرقة",
+    "حي العقيق",
+    "حي الصحافة",
+    "حي العليا",
+    "حي الرحمانية",
+  ],
+  "وسط الرياض": [
+    "حي الديرة",
+    "حي المرقب",
+    "حي العود",
+    "حي المربع",
+    "حي الرميلة",
+  ],
+
+  "شمال جدة": ["حي الشاطئ", "حي أبحر", "حي ذهبان", "حي النعيم", "حي الفيصلية"],
+  "جنوب جدة": [
+    "حي البوادي",
+    "حي العزيزية",
+    "حي القريات",
+    "حي المحاميد",
+    "حي الحرازات",
+  ],
+  "شرق جدة": [
+    "حي ال��زهة",
+    "حي الروضة",
+    "حي الفيصلية",
+    "حي النخيل",
+    "حي الروابي",
+  ],
+  "غرب جدة": [
+    "حي البلد",
+    "حي الشرفية",
+    "حي الحمراء",
+    "حي الزهراء",
+    "حي السلامة",
+  ],
+  "وسط جدة": [
+    "حي العزيزية",
+    "حي الروضة",
+    "حي الفيصلية",
+    "حي النزهة",
+    "حي الصفا",
+  ],
+
+  "المنطقة المركزية": ["العزيزية", "النسيم", "العوالي", "الششة", "الضيافة"],
+  العزيزية: ["الششة", "النسيم", "الحجون", "التيسير", "المرسلات"],
+  الششة: ["العزيزية", "النسيم", "الضيافة", "العوالي", "المرسلات"],
+  النسيم: ["الششة", "العزيزية", "العوالي", "الضيافة", "المرسلات"],
+  العوالي: ["الششة", "النسيم", "الضيافة", "المرسلات", "التيسير"],
+
+  "شمال الدمام": [
+    "حي الشاطئ",
+    "حي الحمراء",
+    "حي النورس",
+    "حي الناصرية",
+    "حي طيبة",
+  ],
+  "جنوب الدمام": [
+    "حي عبد الله فؤاد",
+    "حي الفيصلية",
+    "حي البادية",
+    "حي غرناطة",
+    "حي الجلوية",
+  ],
+  "شرق الدمام": [
+    "حي الشاطئ",
+    "حي البحيرة",
+    "حي الهدا",
+    "حي المنار",
+    "حي الصفا",
+  ],
+  "غرب الدمام": [
+    "حي النزهة",
+    "حي الروضة",
+    "حي الفنار",
+    "حي أحد",
+    "حي المزروعية",
+  ],
+  "وسط الدمام": [
+    "حي الطبيشي",
+    "حي القزاز",
+    "حي الدواسر",
+    "حي الخليج",
+    "حي الفيصلية",
+  ],
+};
+
+/**
  * Average housing prices in major Saudi cities (estimates in SAR)
  */
 export const cityHousingData: Record<
@@ -214,9 +328,24 @@ export const cityHousingData: Record<
     inflationRate: number; // Annual real estate inflation rate
     districts: Array<{
       name: string;
+      area: string; // North, South, East, West, Central
       priceMultiplier: number; // Relative to city average
       demandScore: number; // 1-10 scale
       futureGrowthPotential: number; // 1-10 scale
+      propertyTypes: {
+        شقة: {
+          pricePerMeter: number;
+          availableSizes: number[]; // in square meters
+        };
+        فيلا: {
+          pricePerMeter: number;
+          availableSizes: number[]; // in square meters
+        };
+        دوبلكس: {
+          pricePerMeter: number;
+          availableSizes: number[]; // in square meters
+        };
+      };
     }>;
   }
 > = {
@@ -227,33 +356,171 @@ export const cityHousingData: Record<
     districts: [
       {
         name: "حي النرجس",
+        area: "شمال",
         priceMultiplier: 1.2,
         demandScore: 8,
         futureGrowthPotential: 9,
+        propertyTypes: {
+          شقة: {
+            pricePerMeter: 5200,
+            availableSizes: [120, 150, 180],
+          },
+          فيلا: {
+            pricePerMeter: 4800,
+            availableSizes: [350, 450, 550],
+          },
+          دوبلكس: {
+            pricePerMeter: 5000,
+            availableSizes: [250, 300, 350],
+          },
+        },
       },
       {
-        name: "حي العليا",
-        priceMultiplier: 1.5,
-        demandScore: 9,
-        futureGrowthPotential: 7,
+        name: "حي الياسمين",
+        area: "شمال",
+        priceMultiplier: 1.15,
+        demandScore: 8,
+        futureGrowthPotential: 8,
+        propertyTypes: {
+          شقة: {
+            pricePerMeter: 5000,
+            availableSizes: [110, 140, 170],
+          },
+          فيلا: {
+            pricePerMeter: 4700,
+            availableSizes: [320, 420, 520],
+          },
+          دوبلكس: {
+            pricePerMeter: 4900,
+            availableSizes: [240, 290, 340],
+          },
+        },
       },
       {
         name: "حي الملقا",
+        area: "شمال",
         priceMultiplier: 1.3,
-        demandScore: 8,
+        demandScore: 9,
         futureGrowthPotential: 8,
+        propertyTypes: {
+          شقة: {
+            pricePerMeter: 5500,
+            availableSizes: [130, 160, 190],
+          },
+          فيلا: {
+            pricePerMeter: 5200,
+            availableSizes: [400, 500, 600],
+          },
+          دوبلكس: {
+            pricePerMeter: 5300,
+            availableSizes: [270, 320, 370],
+          },
+        },
+      },
+      {
+        name: "حي العليا",
+        area: "غرب",
+        priceMultiplier: 1.5,
+        demandScore: 9,
+        futureGrowthPotential: 7,
+        propertyTypes: {
+          شقة: {
+            pricePerMeter: 6500,
+            availableSizes: [100, 130, 160],
+          },
+          فيلا: {
+            pricePerMeter: 6200,
+            availableSizes: [450, 550, 650],
+          },
+          دوبلكس: {
+            pricePerMeter: 6300,
+            availableSizes: [300, 350, 400],
+          },
+        },
       },
       {
         name: "حي اليرموك",
+        area: "شرق",
         priceMultiplier: 0.9,
         demandScore: 7,
         futureGrowthPotential: 8,
+        propertyTypes: {
+          شقة: {
+            pricePerMeter: 4200,
+            availableSizes: [100, 130, 160],
+          },
+          فيلا: {
+            pricePerMeter: 3900,
+            availableSizes: [300, 400, 500],
+          },
+          دوبلكس: {
+            pricePerMeter: 4000,
+            availableSizes: [220, 270, 320],
+          },
+        },
       },
       {
         name: "حي الصحافة",
+        area: "غرب",
         priceMultiplier: 1.1,
         demandScore: 8,
         futureGrowthPotential: 8,
+        propertyTypes: {
+          شقة: {
+            pricePerMeter: 5000,
+            availableSizes: [110, 140, 170],
+          },
+          فيلا: {
+            pricePerMeter: 4700,
+            availableSizes: [350, 450, 550],
+          },
+          دوبلكس: {
+            pricePerMeter: 4800,
+            availableSizes: [250, 300, 350],
+          },
+        },
+      },
+      {
+        name: "حي النسيم",
+        area: "جنوب",
+        priceMultiplier: 0.85,
+        demandScore: 6,
+        futureGrowthPotential: 7,
+        propertyTypes: {
+          شقة: {
+            pricePerMeter: 3800,
+            availableSizes: [90, 120, 150],
+          },
+          فيلا: {
+            pricePerMeter: 3500,
+            availableSizes: [300, 400, 500],
+          },
+          دوبلكس: {
+            pricePerMeter: 3600,
+            availableSizes: [220, 270, 320],
+          },
+        },
+      },
+      {
+        name: "حي الشفا",
+        area: "جنوب",
+        priceMultiplier: 0.8,
+        demandScore: 6,
+        futureGrowthPotential: 7,
+        propertyTypes: {
+          شقة: {
+            pricePerMeter: 3600,
+            availableSizes: [90, 120, 150],
+          },
+          فيلا: {
+            pricePerMeter: 3300,
+            availableSizes: [300, 400, 500],
+          },
+          دوبلكس: {
+            pricePerMeter: 3400,
+            availableSizes: [220, 270, 320],
+          },
+        },
       },
     ],
   },
@@ -264,33 +531,66 @@ export const cityHousingData: Record<
     districts: [
       {
         name: "حي الشاطئ",
+        area: "شمال",
         priceMultiplier: 1.4,
         demandScore: 9,
         futureGrowthPotential: 8,
+        propertyTypes: {
+          شقة: {
+            pricePerMeter: 5800,
+            availableSizes: [110, 140, 170],
+          },
+          فيلا: {
+            pricePerMeter: 5500,
+            availableSizes: [350, 450, 550],
+          },
+          دوبلكس: {
+            pricePerMeter: 5600,
+            availableSizes: [250, 300, 350],
+          },
+        },
       },
       {
         name: "حي الروضة",
+        area: "شرق",
         priceMultiplier: 1.2,
         demandScore: 8,
         futureGrowthPotential: 7,
+        propertyTypes: {
+          شقة: {
+            pricePerMeter: 5000,
+            availableSizes: [100, 130, 160],
+          },
+          فيلا: {
+            pricePerMeter: 4700,
+            availableSizes: [320, 420, 520],
+          },
+          دوبلكس: {
+            pricePerMeter: 4800,
+            availableSizes: [240, 290, 340],
+          },
+        },
       },
       {
         name: "حي السلامة",
+        area: "غرب",
         priceMultiplier: 1.1,
         demandScore: 7,
         futureGrowthPotential: 7,
-      },
-      {
-        name: "حي الصفا",
-        priceMultiplier: 1.0,
-        demandScore: 7,
-        futureGrowthPotential: 6,
-      },
-      {
-        name: "حي النزهة",
-        priceMultiplier: 0.9,
-        demandScore: 6,
-        futureGrowthPotential: 7,
+        propertyTypes: {
+          شقة: {
+            pricePerMeter: 4700,
+            availableSizes: [100, 130, 160],
+          },
+          فيلا: {
+            pricePerMeter: 4400,
+            availableSizes: [320, 420, 520],
+          },
+          دوبلكس: {
+            pricePerMeter: 4500,
+            availableSizes: [240, 290, 340],
+          },
+        },
       },
     ],
   },
@@ -301,33 +601,45 @@ export const cityHousingData: Record<
     districts: [
       {
         name: "العزيزية",
+        area: "وسط",
         priceMultiplier: 1.3,
         demandScore: 9,
         futureGrowthPotential: 8,
+        propertyTypes: {
+          شقة: {
+            pricePerMeter: 7000,
+            availableSizes: [90, 120, 150],
+          },
+          فيلا: {
+            pricePerMeter: 6700,
+            availableSizes: [350, 450, 550],
+          },
+          دوبلكس: {
+            pricePerMeter: 6800,
+            availableSizes: [250, 300, 350],
+          },
+        },
       },
       {
         name: "الششة",
+        area: "وسط",
         priceMultiplier: 0.9,
         demandScore: 7,
         futureGrowthPotential: 7,
-      },
-      {
-        name: "النسيم",
-        priceMultiplier: 0.8,
-        demandScore: 6,
-        futureGrowthPotential: 8,
-      },
-      {
-        name: "العوالي",
-        priceMultiplier: 0.7,
-        demandScore: 6,
-        futureGrowthPotential: 7,
-      },
-      {
-        name: "المرسلات",
-        priceMultiplier: 0.8,
-        demandScore: 7,
-        futureGrowthPotential: 7,
+        propertyTypes: {
+          شقة: {
+            pricePerMeter: 5000,
+            availableSizes: [90, 120, 150],
+          },
+          فيلا: {
+            pricePerMeter: 4700,
+            availableSizes: [300, 400, 500],
+          },
+          دوبلكس: {
+            pricePerMeter: 4800,
+            availableSizes: [220, 270, 320],
+          },
+        },
       },
     ],
   },
@@ -338,33 +650,24 @@ export const cityHousingData: Record<
     districts: [
       {
         name: "قباء",
+        area: "وسط",
         priceMultiplier: 1.1,
         demandScore: 8,
         futureGrowthPotential: 8,
-      },
-      {
-        name: "العوالي",
-        priceMultiplier: 1.2,
-        demandScore: 8,
-        futureGrowthPotential: 7,
-      },
-      {
-        name: "الحرة الشرقية",
-        priceMultiplier: 0.9,
-        demandScore: 7,
-        futureGrowthPotential: 7,
-      },
-      {
-        name: "النخيل",
-        priceMultiplier: 0.8,
-        demandScore: 6,
-        futureGrowthPotential: 8,
-      },
-      {
-        name: "بني حارثة",
-        priceMultiplier: 0.7,
-        demandScore: 6,
-        futureGrowthPotential: 7,
+        propertyTypes: {
+          شقة: {
+            pricePerMeter: 4600,
+            availableSizes: [100, 130, 160],
+          },
+          فيلا: {
+            pricePerMeter: 4300,
+            availableSizes: [320, 420, 520],
+          },
+          دوبلكس: {
+            pricePerMeter: 4400,
+            availableSizes: [240, 290, 340],
+          },
+        },
       },
     ],
   },
@@ -375,36 +678,344 @@ export const cityHousingData: Record<
     districts: [
       {
         name: "الشاطئ",
+        area: "شمال",
         priceMultiplier: 1.3,
         demandScore: 8,
         futureGrowthPotential: 8,
-      },
-      {
-        name: "الروضة",
-        priceMultiplier: 1.1,
-        demandScore: 7,
-        futureGrowthPotential: 7,
-      },
-      {
-        name: "النزهة",
-        priceMultiplier: 1.0,
-        demandScore: 7,
-        futureGrowthPotential: 7,
-      },
-      {
-        name: "الفيصلية",
-        priceMultiplier: 0.9,
-        demandScore: 6,
-        futureGrowthPotential: 7,
-      },
-      {
-        name: "الفنار",
-        priceMultiplier: 0.8,
-        demandScore: 6,
-        futureGrowthPotential: 6,
+        propertyTypes: {
+          شقة: {
+            pricePerMeter: 4400,
+            availableSizes: [110, 140, 170],
+          },
+          فيلا: {
+            pricePerMeter: 4100,
+            availableSizes: [350, 450, 550],
+          },
+          دوبلكس: {
+            pricePerMeter: 4200,
+            availableSizes: [250, 300, 350],
+          },
+        },
       },
     ],
   },
+};
+
+/**
+ * Find the best district based on work location, budget, and family needs
+ * @param city The city
+ * @param workLocation Work location area
+ * @param budget Maximum budget
+ * @param familySize Family size
+ * @param requiredRooms Required number of rooms
+ * @returns Object with recommended district, property type, and details
+ */
+export const findBestDistrictAndProperty = (
+  city: string,
+  workLocation: string,
+  budget: number,
+  familySize: number,
+  requiredRooms: number,
+): {
+  district: string;
+  propertyType: string;
+  propertySize: number;
+  estimatedPrice: number;
+  monthlyRent: number;
+  reasons: string[];
+} => {
+  // Default return if no match is found
+  const defaultReturn = {
+    district: "",
+    propertyType: "",
+    propertySize: 0,
+    estimatedPrice: 0,
+    monthlyRent: 0,
+    reasons: ["لم يتم العثور على توصيات مناسبة للمعايير المحددة"],
+  };
+
+  // Get city data
+  const cityData = cityHousingData[city];
+  if (!cityData) return defaultReturn;
+
+  // Get districts near work location
+  const nearbyDistricts =
+    workLocationToDistricts[
+      workLocation as keyof typeof workLocationToDistricts
+    ] || [];
+
+  // Map required rooms to property types and sizes
+  let recommendedPropertyType = "شقة"; // Default
+  let minSize = 90; // Default minimum size in sqm
+
+  if (requiredRooms >= 4 || familySize >= 6) {
+    recommendedPropertyType = "فيلا";
+    minSize = 300;
+  } else if (requiredRooms >= 3 || familySize >= 4) {
+    recommendedPropertyType = "دوبلكس";
+    minSize = 220;
+  } else {
+    recommendedPropertyType = "شقة";
+    minSize = 90 + (requiredRooms - 1) * 30; // 30 sqm per additional room
+  }
+
+  // Find districts that match our criteria - prioritize those near work
+  const candidateDistricts = cityData.districts.filter((district) => {
+    // Check if district is near work location
+    const isNearWork = nearbyDistricts.includes(district.name);
+
+    // Check if property type is available in this district
+    const propertyTypeData =
+      district.propertyTypes[
+        recommendedPropertyType as keyof typeof district.propertyTypes
+      ];
+    if (!propertyTypeData) return false;
+
+    // Find available size that meets our needs
+    const availableSize = propertyTypeData.availableSizes.find(
+      (size) => size >= minSize,
+    );
+    if (!availableSize) return false;
+
+    // Calculate estimated price
+    const estimatedPrice = propertyTypeData.pricePerMeter * availableSize;
+
+    // Check if within budget
+    return (
+      estimatedPrice <= budget && (isNearWork || nearbyDistricts.length === 0)
+    );
+  });
+
+  // If no matches near work, try any district in the city
+  const allCandidateDistricts =
+    candidateDistricts.length > 0
+      ? candidateDistricts
+      : cityData.districts.filter((district) => {
+          const propertyTypeData =
+            district.propertyTypes[
+              recommendedPropertyType as keyof typeof district.propertyTypes
+            ];
+          if (!propertyTypeData) return false;
+
+          const availableSize = propertyTypeData.availableSizes.find(
+            (size) => size >= minSize,
+          );
+          if (!availableSize) return false;
+
+          const estimatedPrice = propertyTypeData.pricePerMeter * availableSize;
+          return estimatedPrice <= budget;
+        });
+
+  // If still no matches, try smaller property types
+  if (allCandidateDistricts.length === 0) {
+    if (recommendedPropertyType === "فيلا") {
+      recommendedPropertyType = "دوبلكس";
+      minSize = 220;
+    } else if (recommendedPropertyType === "دوبلكس") {
+      recommendedPropertyType = "شقة";
+      minSize = 90 + (requiredRooms - 1) * 30;
+    } else {
+      minSize = Math.max(90, minSize - 30); // Reduce size by 30 sqm
+    }
+
+    // Try again with reduced criteria
+    return findBestDistrictAndProperty(
+      city,
+      workLocation,
+      budget,
+      familySize,
+      requiredRooms - 1,
+    );
+  }
+
+  // Sort candidates by combination of proximity to work, demand score, and future growth
+  const sortedDistricts = allCandidateDistricts.sort((a, b) => {
+    const aIsNearWork = nearbyDistricts.includes(a.name) ? 1 : 0;
+    const bIsNearWork = nearbyDistricts.includes(b.name) ? 1 : 0;
+
+    // Create a combined score (60% proximity, 25% demand, 15% growth)
+    const aScore =
+      aIsNearWork * 60 + a.demandScore * 2.5 + a.futureGrowthPotential * 1.5;
+    const bScore =
+      bIsNearWork * 60 + b.demandScore * 2.5 + b.futureGrowthPotential * 1.5;
+
+    return bScore - aScore;
+  });
+
+  // Select the best district
+  const bestDistrict = sortedDistricts[0];
+  if (!bestDistrict) return defaultReturn;
+
+  // Get property data
+  const propertyData =
+    bestDistrict.propertyTypes[
+      recommendedPropertyType as keyof typeof bestDistrict.propertyTypes
+    ];
+  if (!propertyData) return defaultReturn;
+
+  // Find the best size that meets our needs
+  const availableSizes = propertyData.availableSizes.filter(
+    (size) => size >= minSize,
+  );
+  const bestSize =
+    availableSizes.length > 0
+      ? Math.min(...availableSizes)
+      : propertyData.availableSizes[0];
+
+  // Calculate price
+  const estimatedPrice = propertyData.pricePerMeter * bestSize;
+
+  // Calculate monthly rent (typically 5% annual return on property value)
+  const monthlyRent = Math.round((estimatedPrice * 0.05) / 12);
+
+  // Generate reasons for recommendation
+  const reasons = [];
+  if (nearbyDistricts.includes(bestDistrict.name)) {
+    reasons.push(`قريب من منطقة العمل في ${workLocation}`);
+  }
+  reasons.push(
+    `يناسب حجم الأسرة (${familySize} أفراد) ويوفر ${requiredRooms} غرف`,
+  );
+  reasons.push(
+    `${bestDistrict.name} منطقة ذات طلب مرتفع (${bestDistrict.demandScore}/10) ومستقبل واعد (${bestDistrict.futureGrowthPotential}/10)`,
+  );
+
+  if (estimatedPrice <= budget * 0.9) {
+    reasons.push("ضمن الميزانية المتاحة مع هامش أمان جيد");
+  }
+
+  return {
+    district: bestDistrict.name,
+    propertyType: recommendedPropertyType,
+    propertySize: bestSize,
+    estimatedPrice,
+    monthlyRent,
+    reasons,
+  };
+};
+
+/**
+ * Analyze budget, income, and retirement to determine optimal ownership strategy
+ */
+export const analyzeOwnershipStrategy = (
+  monthlyIncome: number,
+  monthlyObligations: number,
+  age: number,
+  yearsUntilRetirement: number,
+  city: string,
+  mortgageInterestRate: number,
+  budget: number,
+): {
+  recommended: "buy" | "rent";
+  financingOption: string;
+  monthlyPayment: number;
+  loanAmount: number;
+  loanTerm: number;
+  downPayment: number;
+  reasons: string[];
+} => {
+  const netIncome = monthlyIncome - monthlyObligations;
+  const cityData = cityHousingData[city];
+  const reasons: string[] = [];
+
+  // Default values
+  let recommended: "buy" | "rent" = "buy";
+  let financingOption = "تمويل عقاري";
+  let loanAmount = 0;
+  let loanTerm = 0;
+  let downPayment = 0;
+  let monthlyPayment = 0;
+
+  // Determine if buying is better than renting
+
+  // 1. Age and retirement considerations
+  if (age > 50 || yearsUntilRetirement < 15) {
+    reasons.push("اقتراب سن التقاعد يجعل فترة القرض العقاري أقصر");
+    if (yearsUntilRetirement < 10) {
+      recommended = "rent";
+      reasons.push("قرب التقاعد يجعل الإيجار خياراً أكثر مرونة ماليًا");
+    }
+  }
+
+  // 2. Market conditions
+  if (cityData) {
+    if (cityData.inflationRate > 0.05) {
+      reasons.push(
+        "معدل التضخم العقاري مرتفع في المدينة، مما يجعل التملك استثماراً جيداً",
+      );
+    } else {
+      reasons.push(
+        "معدل التضخم العقاري معتدل، مما يجعل كلا الخيارين (التملك والإيجار) مناسبين",
+      );
+    }
+  }
+
+  // 3. Financial health
+  const affordabilityRatio = (netIncome * 0.35) / netIncome;
+  if (affordabilityRatio < 0.3) {
+    reasons.push(
+      "نسبة الاستقطاع من الدخل منخفضة، مما يشير إلى قدرة مالية جيدة على التملك",
+    );
+  } else if (affordabilityRatio > 0.45) {
+    recommended = "rent";
+    reasons.push(
+      "نسبة الاستقطاع من الدخل مرتفعة، قد يكون الإيجار أكثر أماناً ماليًا",
+    );
+  }
+
+  // If buying is recommended, determine financing option
+  if (recommended === "buy") {
+    // Calculate mortgage terms
+    loanTerm = Math.min(25, yearsUntilRetirement + 5);
+    downPayment = budget * 0.2; // 20% down payment
+    loanAmount = budget * 0.8; // 80% loan
+
+    // Calculate monthly payment using the mortgage formula
+    const monthlyRate = mortgageInterestRate / 100 / 12;
+    const numberOfPayments = loanTerm * 12;
+    monthlyPayment =
+      (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)) /
+      (Math.pow(1 + monthlyRate, numberOfPayments) - 1);
+
+    // Check if monthly payment is affordable (should be < 35% of net income)
+    if (monthlyPayment > netIncome * 0.35) {
+      // Try increasing down payment to make it affordable
+      const maxLoanAmount =
+        (netIncome * 0.35 * (Math.pow(1 + monthlyRate, numberOfPayments) - 1)) /
+        (monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments));
+
+      if (maxLoanAmount + downPayment < budget) {
+        // Needs higher down payment
+        downPayment = budget - maxLoanAmount;
+        loanAmount = maxLoanAmount;
+        monthlyPayment = netIncome * 0.35;
+
+        if (downPayment > budget * 0.5) {
+          // If down payment needs to be more than 50%, maybe renting is better
+          recommended = "rent";
+          reasons.push(
+            "التملك يتطلب دفعة أولى كبيرة، الإيجار قد يكون أكثر مرونة",
+          );
+        } else {
+          reasons.push(
+            `الدفعة الأولى المطلوبة: ${Math.round(downPayment)} ريال (${Math.round((downPayment / budget) * 100)}% من قيمة العقار)`,
+          );
+        }
+      }
+    } else {
+      reasons.push("القسط الشهري للتمويل العقاري ضمن حدود الميزانية المتاحة");
+    }
+  }
+
+  return {
+    recommended,
+    financingOption,
+    monthlyPayment,
+    loanAmount,
+    loanTerm,
+    downPayment,
+    reasons,
+  };
 };
 
 // Mock data for APIs
@@ -505,7 +1116,7 @@ const mockRealEstateIndicators: RealEstateIndicator[] = [
   {
     id: 1,
     city: "الرياض",
-    indicator: "مع��ل النمو",
+    indicator: "معدل النمو",
     value: 5.2,
     year: 2023,
     quarter: 2,
@@ -610,139 +1221,3 @@ const mockHousingFinance: HousingFinance[] = [
     month: 5,
   },
 ];
-
-/**
- * Get recommended district based on family size, budget, and property type
- */
-export const getRecommendedDistrict = (
-  city: string,
-  budget: number,
-  familySize: number,
-  propertyType: string,
-) => {
-  const cityData = cityHousingData[city];
-  if (!cityData) return null;
-
-  // Filter districts that fit within budget
-  const affordableDistricts = cityData.districts.filter((district) => {
-    const estimatedPrice = getEstimatedPropertyPrice(
-      city,
-      district.name,
-      propertyType,
-    );
-    return estimatedPrice <= budget;
-  });
-
-  if (affordableDistricts.length === 0) return null;
-
-  // For small families, prioritize areas with good future growth
-  // For larger families, prioritize areas with high demand (indicating better services, schools, etc.)
-  const sortedDistricts = affordableDistricts.sort((a, b) => {
-    const aScore =
-      familySize <= 3
-        ? a.futureGrowthPotential * 0.7 + a.demandScore * 0.3
-        : a.demandScore * 0.7 + a.futureGrowthPotential * 0.3;
-
-    const bScore =
-      familySize <= 3
-        ? b.futureGrowthPotential * 0.7 + b.demandScore * 0.3
-        : b.demandScore * 0.7 + b.futureGrowthPotential * 0.3;
-
-    return bScore - aScore;
-  });
-
-  return sortedDistricts[0];
-};
-
-/**
- * Get estimated property price based on city, district, and property type
- */
-export const getEstimatedPropertyPrice = (
-  city: string,
-  district: string,
-  propertyType: string,
-): number => {
-  // First check if we have exact match in the mock data
-  const exactMatch = mockRealEstatePrices.find(
-    (item) =>
-      item.city === city &&
-      item.district === district &&
-      item.propertyType === propertyType,
-  );
-
-  if (exactMatch) {
-    return exactMatch.averagePrice;
-  }
-
-  // If no exact match, calculate based on city average and district multiplier
-  const cityData = cityHousingData[city];
-  if (!cityData) return 0;
-
-  const districtData = cityData.districts.find((d) => d.name === district);
-  if (!districtData) return cityData.avgPrice;
-
-  // Adjust price based on property type
-  const propertyTypeMultiplier =
-    propertyType === "فيلا"
-      ? 2.2
-      : propertyType === "دوبلكس"
-        ? 1.8
-        : propertyType === "شقة"
-          ? 1.0
-          : propertyType === "استوديو"
-            ? 0.6
-            : 1.0;
-
-  return (
-    cityData.avgPrice * districtData.priceMultiplier * propertyTypeMultiplier
-  );
-};
-
-/**
- * Determine if renting is better than buying based on various factors
- */
-export const shouldRentInsteadOfBuy = (
-  city: string,
-  age: number,
-  budget: number,
-  timeUntilRetirement: number,
-): { recommendation: boolean; reasons: string[] } => {
-  const cityData = cityHousingData[city];
-  const reasons: string[] = [];
-
-  // If inflation rate is very high, buying is generally better
-  if (cityData && cityData.inflationRate > 0.055) {
-    reasons.push(
-      "معدل التضخم العقاري مرتفع في هذه المدينة، مما يجعل الشراء أفضل على المدى الطويل",
-    );
-  }
-
-  // If person is older, renting might be better
-  if (age > 50) {
-    reasons.push(
-      "نظرًا لعمرك، قد يكون الإيجار خيارًا أفضل لتجنب القروض طويلة الأجل",
-    );
-  }
-
-  // If budget is very low compared to city average
-  if (cityData && budget < cityData.avgPrice * 0.7) {
-    reasons.push(
-      "ميزانيتك أقل من متوسط أسعار العقارات في هذه المدينة، قد يكون الإيجار أكثر مرونة",
-    );
-  }
-
-  // If retirement is coming soon
-  if (timeUntilRetirement < 10) {
-    reasons.push("اقتراب سن التقاعد يجعل الإيجار خيارًا أكثر مرونة ماليًا");
-  }
-
-  // Decision logic
-  if (reasons.length >= 2) {
-    return { recommendation: true, reasons };
-  }
-
-  return {
-    recommendation: false,
-    reasons: ["الشراء عمومًا أفضل للاستقرار طويل المدى وبناء الأصول"],
-  };
-};
