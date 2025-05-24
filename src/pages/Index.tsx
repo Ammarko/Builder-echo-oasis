@@ -1,37 +1,101 @@
+import React, { useState } from "react";
+import {
+  RealEstateBudgetForm,
+  BudgetFormValues,
+} from "@/components/RealEstateBudgetForm";
+import { BudgetResult } from "@/components/BudgetResult";
+import {
+  calculateNetIncome,
+  calculateMaxBudget,
+  recommendPropertyType,
+} from "@/lib/budget-calculator";
+import { useSaudiDate } from "@/lib/api";
+
 const Index = () => {
+  const [results, setResults] = useState<{
+    maxBudget: number;
+    propertyType: string;
+    showResults: boolean;
+    formData: BudgetFormValues | null;
+  }>({
+    maxBudget: 0,
+    propertyType: "",
+    showResults: false,
+    formData: null,
+  });
+
+  // Fetch current date from Saudi API
+  const { data: dateData, isLoading } = useSaudiDate();
+
+  const handleFormSubmit = (data: BudgetFormValues) => {
+    // Calculate net income
+    const netIncome = calculateNetIncome(
+      data.monthlyIncome,
+      data.monthlyObligations,
+    );
+
+    // Calculate maximum budget based on financing option
+    const maxBudget = calculateMaxBudget(
+      netIncome,
+      data.financingOption as "Cash" | "Mortgage",
+    );
+
+    // Get property type recommendation
+    const propertyType = recommendPropertyType(maxBudget);
+
+    // Set results
+    setResults({
+      maxBudget,
+      propertyType,
+      showResults: true,
+      formData: data,
+    });
+  };
+
+  // Format date strings
+  const gregorianDate = dateData?.data?.gregorian
+    ? `${dateData.data.gregorian.day} ${dateData.data.gregorian.month.en} ${dateData.data.gregorian.year}`
+    : undefined;
+
+  const hijriDate = dateData?.data?.hijri
+    ? `${dateData.data.hijri.day} ${dateData.data.hijri.month.ar} ${dateData.data.hijri.year}`
+    : undefined;
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
-      <div className="text-center">
-        {/* TODO: replace everything here with the actual app! */}
-        <h1 className="text-2xl font-semibold text-slate-800 flex items-center justify-center gap-3">
-          <svg
-            className="animate-spin h-8 w-8 text-slate-400"
-            viewBox="0 0 50 50"
-          >
-            <circle
-              className="opacity-30"
-              cx="25"
-              cy="25"
-              r="20"
-              stroke="currentColor"
-              strokeWidth="5"
-              fill="none"
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
+      <h1 className="text-3xl font-bold text-center text-blue-800 mb-8">
+        مساعد حساب ميزانية العقارات
+      </h1>
+
+      <div className="w-full max-w-4xl flex flex-col md:flex-row gap-6 justify-center items-center md:items-start">
+        <div className="w-full md:w-1/2">
+          <RealEstateBudgetForm onSubmit={handleFormSubmit} />
+        </div>
+
+        {results.showResults && results.formData && (
+          <div className="w-full md:w-1/2 mt-6 md:mt-0">
+            <BudgetResult
+              maxBudget={results.maxBudget}
+              propertyType={results.propertyType as any}
+              city={results.formData.city}
+              familySize={results.formData.familySize}
+              financingOption={
+                results.formData.financingOption as "Cash" | "Mortgage"
+              }
+              gregorianDate={gregorianDate}
+              hijriDate={hijriDate}
+              isLoading={isLoading}
             />
-            <circle
-              className="text-slate-600"
-              cx="25"
-              cy="25"
-              r="20"
-              stroke="currentColor"
-              strokeWidth="5"
-              fill="none"
-              strokeDasharray="100"
-              strokeDashoffset="75"
-            />
-          </svg>
-          Generating your app...
-        </h1>
+          </div>
+        )}
       </div>
+
+      <footer className="mt-12 text-center text-gray-500 text-sm">
+        <p>
+          © {new Date().getFullYear()} مساعد حساب ميزانية العقارات - جميع
+          الحقوق محفوظة
+        </p>
+      </footer>
     </div>
   );
 };
