@@ -8,8 +8,7 @@
     "build": "vite build",
     "test": "vitest --run",
     "format.fix": "prettier --write .",
-    "typecheck": "tsc",
-    "postinstall": "if [ \"$(uname)\" = \"Linux\" ]; then npm install @rollup/rollup-linux-x64-gnu @swc/core-linux-x64-gnu; fi"
+    "typecheck": "tsc"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
