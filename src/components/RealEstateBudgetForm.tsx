@@ -29,6 +29,17 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { 
+  DollarSign, 
+  User, 
+  MapPin, 
+  Calculator,
+  TrendingUp,
+  Percent,
+  Users,
+  Home,
+  Calendar
+} from "lucide-react";
 
 // Work locations for major cities
 const workLocations = {
@@ -153,191 +164,235 @@ export const RealEstateBudgetForm: React.FC<RealEstateBudgetFormProps> = ({
   }, [form.watch("currentCity")]);
 
   return (
-    <Card className="w-full max-w-md shadow-lg">
-      <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-t-lg">
-        <CardTitle className="text-center text-xl">
-          حاسبة ميزانية العقارات
-        </CardTitle>
+    <Card className="w-full max-w-2xl shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
+      <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-t-lg relative overflow-hidden">
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="relative">
+          <CardTitle className="text-center text-2xl flex justify-center gap-3 items-center">
+            <Calculator className="h-6 w-6" />
+            حاسبة ميزانية العقارات
+          </CardTitle>
+          <p className="text-center text-blue-100 mt-2 text-sm">
+            أدخل بياناتك للحصول على توصيات مخصصة
+          </p>
+        </div>
       </CardHeader>
-      <CardContent className="pt-6">
+      <CardContent className="pt-8 pb-6">
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-6"
             dir="rtl"
           >
-            <Accordion type="single" collapsible defaultValue="financial">
-              <AccordionItem value="financial">
-                <AccordionTrigger className="text-lg font-medium text-blue-700">
-                  المعلومات المالية
+            <Accordion type="single" collapsible defaultValue="financial" className="space-y-4">
+              <AccordionItem value="financial" className="border border-blue-100 rounded-lg px-4 bg-gradient-to-r from-blue-50 to-indigo-50">
+                <AccordionTrigger className="text-lg font-semibold text-blue-800 hover:text-blue-900 py-4">
+                  <div className="flex items-center gap-3">
+                    <DollarSign className="h-5 w-5" />
+                    المعلومات المالية
+                  </div>
                 </AccordionTrigger>
-                <AccordionContent className="space-y-4 pt-4">
-                  <FormField
-                    control={form.control}
-                    name="monthlyIncome"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>الدخل الشهري (ريال)</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="أدخل دخلك الشهري"
-                            type="number"
-                            {...field}
-                            onChange={(e) =>
-                              field.onChange(Number(e.target.value))
-                            }
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                <AccordionContent className="space-y-6 pt-4 pb-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="monthlyIncome"
+                      render={({ field }) => (
+                        <FormItem className="space-y-3">
+                          <FormLabel className="text-base font-medium flex items-center gap-2">
+                            <DollarSign className="h-4 w-4 text-green-600" />
+                            الدخل الشهري (ريال)
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="مثال: 15000"
+                              type="number"
+                              className="h-12 text-lg border-2 focus:border-blue-500 transition-all duration-200"
+                              {...field}
+                              onChange={(e) =>
+                                field.onChange(Number(e.target.value))
+                              }
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                  <FormField
-                    control={form.control}
-                    name="monthlyObligations"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>الالتزامات المالية الشهرية (ريال)</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="أدخل التزاماتك المالية الشهرية"
-                            type="number"
-                            {...field}
-                            onChange={(e) =>
-                              field.onChange(Number(e.target.value))
-                            }
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          الأقساط، القروض، وأي التزامات مالية ثابتة
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                    <FormField
+                      control={form.control}
+                      name="monthlyObligations"
+                      render={({ field }) => (
+                        <FormItem className="space-y-3">
+                          <FormLabel className="text-base font-medium flex items-center gap-2">
+                            <Calculator className="h-4 w-4 text-red-600" />
+                            الالتزامات المالية الشهرية (ريال)
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="مثال: 3000"
+                              type="number"
+                              className="h-12 text-lg border-2 focus:border-blue-500 transition-all duration-200"
+                              {...field}
+                              onChange={(e) =>
+                                field.onChange(Number(e.target.value))
+                              }
+                            />
+                          </FormControl>
+                          <FormDescription className="text-sm text-gray-600">
+                            الأقساط، القروض، وأي التزامات مالية ثابتة
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
 
-                  <FormField
-                    control={form.control}
-                    name="expectedSalaryIncrease"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          معدل الزيادة السنوية المتوقعة في الراتب (%)
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="مثال: 3"
-                            type="number"
-                            {...field}
-                            onChange={(e) =>
-                              field.onChange(Number(e.target.value))
-                            }
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          النسبة المئوية للزيادة السنوية المتوقعة في الراتب
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="expectedSalaryIncrease"
+                      render={({ field }) => (
+                        <FormItem className="space-y-3">
+                          <FormLabel className="text-base font-medium flex items-center gap-2">
+                            <TrendingUp className="h-4 w-4 text-blue-600" />
+                            معدل الزيادة السنوية المتوقعة (%)
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="مثال: 3"
+                              type="number"
+                              className="h-12 text-lg border-2 focus:border-blue-500 transition-all duration-200"
+                              {...field}
+                              onChange={(e) =>
+                                field.onChange(Number(e.target.value))
+                              }
+                            />
+                          </FormControl>
+                          <FormDescription className="text-sm text-gray-600">
+                            النسبة المئوية للزيادة السنوية المتوقعة في الراتب
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                  <FormField
-                    control={form.control}
-                    name="mortgageInterestRate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>نسبة الفائدة للقرض العقاري (%)</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="مثال: 4"
-                            type="number"
-                            step="0.1"
-                            {...field}
-                            onChange={(e) =>
-                              field.onChange(Number(e.target.value))
-                            }
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          النسبة المتوقعة بناءً على توجهات السوق هي 4%
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                    <FormField
+                      control={form.control}
+                      name="mortgageInterestRate"
+                      render={({ field }) => (
+                        <FormItem className="space-y-3">
+                          <FormLabel className="text-base font-medium flex items-center gap-2">
+                            <Percent className="h-4 w-4 text-purple-600" />
+                            نسبة الفائدة للقرض العقاري (%)
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="مثال: 4"
+                              type="number"
+                              step="0.1"
+                              className="h-12 text-lg border-2 focus:border-blue-500 transition-all duration-200"
+                              {...field}
+                              onChange={(e) =>
+                                field.onChange(Number(e.target.value))
+                              }
+                            />
+                          </FormControl>
+                          <FormDescription className="text-sm text-gray-600">
+                            النسبة المتوقعة بناءً على توجهات السوق هي 4%
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="personal">
-                <AccordionTrigger className="text-lg font-medium text-blue-700">
-                  المعلومات الشخصية
+              <AccordionItem value="personal" className="border border-green-100 rounded-lg px-4 bg-gradient-to-r from-green-50 to-emerald-50">
+                <AccordionTrigger className="text-lg font-semibold text-green-800 hover:text-green-900 py-4">
+                  <div className="flex items-center gap-3">
+                    <User className="h-5 w-5" />
+                    المعلومات الشخصية
+                  </div>
                 </AccordionTrigger>
-                <AccordionContent className="space-y-4 pt-4">
-                  <FormField
-                    control={form.control}
-                    name="age"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>العمر</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="أدخل عمرك"
-                            type="number"
-                            {...field}
-                            onChange={(e) =>
-                              field.onChange(Number(e.target.value))
-                            }
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          يؤثر العمر على حساب الفترة المتبقية حتى التقاعد (65
-                          سنة)
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                <AccordionContent className="space-y-6 pt-4 pb-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="age"
+                      render={({ field }) => (
+                        <FormItem className="space-y-3">
+                          <FormLabel className="text-base font-medium flex items-center gap-2">
+                            <Calendar className="h-4 w-4 text-blue-600" />
+                            العمر
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="مثال: 30"
+                              type="number"
+                              className="h-12 text-lg border-2 focus:border-green-500 transition-all duration-200"
+                              {...field}
+                              onChange={(e) =>
+                                field.onChange(Number(e.target.value))
+                              }
+                            />
+                          </FormControl>
+                          <FormDescription className="text-sm text-gray-600">
+                            يؤثر العمر على حساب الفترة المتبقية حتى التقاعد (65 سنة)
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                  <FormField
-                    control={form.control}
-                    name="familySize"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>عدد أفراد الأسرة</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="أدخل عدد أفراد الأسرة"
-                            type="number"
-                            {...field}
-                            onChange={(e) =>
-                              field.onChange(Number(e.target.value))
-                            }
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                    <FormField
+                      control={form.control}
+                      name="familySize"
+                      render={({ field }) => (
+                        <FormItem className="space-y-3">
+                          <FormLabel className="text-base font-medium flex items-center gap-2">
+                            <Users className="h-4 w-4 text-purple-600" />
+                            عدد أفراد الأسرة
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="مثال: 4"
+                              type="number"
+                              className="h-12 text-lg border-2 focus:border-green-500 transition-all duration-200"
+                              {...field}
+                              onChange={(e) =>
+                                field.onChange(Number(e.target.value))
+                              }
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
 
                   <FormField
                     control={form.control}
                     name="requiredRooms"
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>عدد الغرف المطلوبة</FormLabel>
+                      <FormItem className="space-y-3">
+                        <FormLabel className="text-base font-medium flex items-center gap-2">
+                          <Home className="h-4 w-4 text-orange-600" />
+                          عدد الغرف المطلوبة
+                        </FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="أدخل عدد الغرف المطلوبة"
+                            placeholder="مثال: 3"
                             type="number"
+                            className="h-12 text-lg border-2 focus:border-green-500 transition-all duration-200"
                             {...field}
                             onChange={(e) =>
                               field.onChange(Number(e.target.value))
                             }
                           />
                         </FormControl>
-                        <FormDescription>
+                        <FormDescription className="text-sm text-gray-600">
                           تلقائيًا مبني على حجم الأسرة، يمكنك تعديله
                         </FormDescription>
                         <FormMessage />
@@ -347,80 +402,94 @@ export const RealEstateBudgetForm: React.FC<RealEstateBudgetFormProps> = ({
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="location">
-                <AccordionTrigger className="text-lg font-medium text-blue-700">
-                  معلومات الموقع
+              <AccordionItem value="location" className="border border-purple-100 rounded-lg px-4 bg-gradient-to-r from-purple-50 to-pink-50">
+                <AccordionTrigger className="text-lg font-semibold text-purple-800 hover:text-purple-900 py-4">
+                  <div className="flex items-center gap-3">
+                    <MapPin className="h-5 w-5" />
+                    معلومات الموقع
+                  </div>
                 </AccordionTrigger>
-                <AccordionContent className="space-y-4 pt-4">
-                  <FormField
-                    control={form.control}
-                    name="currentCity"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>المدينة الحالية</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="اختر المدينة الحالية" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {saudiCities.map((city) => (
-                              <SelectItem key={city} value={city}>
-                                {city}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                <AccordionContent className="space-y-6 pt-4 pb-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="currentCity"
+                      render={({ field }) => (
+                        <FormItem className="space-y-3">
+                          <FormLabel className="text-base font-medium flex items-center gap-2">
+                            <MapPin className="h-4 w-4 text-red-600" />
+                            المدينة الحالية
+                          </FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger className="h-12 text-lg border-2 focus:border-purple-500 transition-all duration-200">
+                                <SelectValue placeholder="اختر المدينة الحالية" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {saudiCities.map((city) => (
+                                <SelectItem key={city} value={city} className="text-lg py-3">
+                                  {city}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                  <FormField
-                    control={form.control}
-                    name="workLocation"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>منطقة العمل</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                          disabled={availableWorkLocations.length === 0}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="اختر منطقة العمل" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {availableWorkLocations.map((location) => (
-                              <SelectItem key={location} value={location}>
-                                {location}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormDescription>
-                          اختر المنطقة التي تعمل فيها لتحديد الأحياء القريبة
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                    <FormField
+                      control={form.control}
+                      name="workLocation"
+                      render={({ field }) => (
+                        <FormItem className="space-y-3">
+                          <FormLabel className="text-base font-medium flex items-center gap-2">
+                            <MapPin className="h-4 w-4 text-blue-600" />
+                            منطقة العمل
+                          </FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            disabled={availableWorkLocations.length === 0}
+                          >
+                            <FormControl>
+                              <SelectTrigger className="h-12 text-lg border-2 focus:border-purple-500 transition-all duration-200">
+                                <SelectValue placeholder="اختر منطقة العمل" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {availableWorkLocations.map((location) => (
+                                <SelectItem key={location} value={location} className="text-lg py-3">
+                                  {location}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormDescription className="text-sm text-gray-600">
+                            اختر المنطقة التي تعمل فيها لتحديد الأحياء القريبة
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
 
-            <Button
-              type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700"
-            >
-              حساب الميزانية والتوصيات
-            </Button>
+            <div className="pt-6">
+              <Button
+                type="submit"
+                className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 transform transition-all duration-200 hover:scale-[1.02] focus:scale-[1.02] shadow-lg hover:shadow-xl"
+              >
+                <Calculator className="h-5 w-5 mr-2" />
+                حساب الميزانية والتوصيات
+              </Button>
+            </div>
           </form>
         </Form>
       </CardContent>
